@@ -22,22 +22,18 @@ public class DemoServiceImpl implements DemoService {
     DemoMapper demoMapper;
 
     @Override
-    public List<Map> getAll() {
+    public List<Map> testRead() {
         List l = demoMapper.testRead();
-        System.out.println(l);
         return l;
     }
 
     @Override
     public String testWrite() {
         Map map = new HashMap();
-        map.put("a", 123);
-        map.put("b", 456);
+        map.put("name", 123);
         int i = demoMapper.testInsert(map);
         return String.valueOf(i);
     }
-
-
 
     /**
      * 测试事务能否正常工作
@@ -46,8 +42,7 @@ public class DemoServiceImpl implements DemoService {
     @Transactional(rollbackFor = RuntimeException.class)
     public String testTransaction(){
         Map map = new HashMap();
-        map.put("a", 123999);
-        map.put("b", 456);
+        map.put("name", 123999);
         int i = demoMapper.testInsert(map);
         throw new RuntimeException("测试事务");
         //return String.valueOf(i);
@@ -55,7 +50,19 @@ public class DemoServiceImpl implements DemoService {
 
     @Override
     public String testUpdate() {
-        return null;
+        Map map = new HashMap();
+        map.put("id", "1");
+        map.put("name", "mzkmzk");
+        int i = demoMapper.testUpdate(map);
+        return String.valueOf(i);
+    }
+
+    @Override
+    public String testDelete(int param) {
+        Map map = new HashMap();
+        map.put("id", param);
+        int i = demoMapper.testDelete(map);
+        return String.valueOf(i);
     }
 
 }

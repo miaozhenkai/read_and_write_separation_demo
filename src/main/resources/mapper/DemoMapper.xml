@@ -1,14 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.mzk.demo.mapper.DemoMapper">
-    <!--楼宇基本信息-->
+    <!--读-->
     <select id="testRead" parameterType="map" resultType="java.util.LinkedHashMap">
-        select * from admin;
+        select * from test;
     </select>
-
+    <!--写-->
     <insert id="testInsert" parameterType="map">
-        INSERT INTO admin (a_name,a_pass) VALUES (#{a},#{b});
+        INSERT INTO test (name) VALUES (#{name});
     </insert>
-
-
+    <!--更新-->
+    <update id="testUpdate" parameterType="map">
+        UPDATE test SET name = #{name} WHERE id = #{id}
+    </update>
+    <!--删除-->
+    <delete id="testDelete" parameterType="map">
+        DELETE FROM test WHERE id = #{id}
+    </delete>
 </mapper>

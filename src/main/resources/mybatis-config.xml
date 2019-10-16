@@ -4,13 +4,14 @@
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
     <settings>
-        <setting name="logImpl" value="STDOUT_LOGGING"/><!-- 打印sql语句相关信息 -->
+        <!-- 打印sql语句相关信息 -->
+        <!--<setting name="logImpl" value="STDOUT_LOGGING"/>-->
         <setting name="defaultStatementTimeout" value="60"/><!-- 超时时间 -->
         <setting name="callSettersOnNulls" value="true"/>
     </settings>
 
     <plugins>
-        <plugin interceptor="com.mzk.demo.interceptor.DynamicDataSourceInterceptor"/>
+        <plugin interceptor="com.mzk.demo.interceptor.DynamicDataSourceInterceptor"/> <!--拦截器-->
     </plugins>
 
     <mappers>

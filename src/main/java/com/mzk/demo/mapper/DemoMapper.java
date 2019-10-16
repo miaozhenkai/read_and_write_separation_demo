@@ -13,8 +13,28 @@ import java.util.Map;
  */
 @Mapper
 public interface DemoMapper {
-
+    /**
+     * 读
+     * @return
+     */
     List<Map> testRead();
 
+    /**
+     * 写
+     * @return
+     */
     int testInsert(Map map);
+
+    /**
+     * 更新
+     * @return
+     */
+    int testUpdate(Map map);
+
+    /**
+     * 删除
+     * @return
+     */
+    int testDelete(Map map);
+
 }

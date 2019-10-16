@@ -22,9 +22,9 @@ public class DemoController {
     DemoService demoService;
 
     @ApiOperation(value = "测试读")
-    @GetMapping("/1")
-    public String tableList() {
-        return demoService.getAll().toString();
+    @GetMapping("/testRead")
+    public String testRead() {
+        return demoService.testRead().toString();
     }
 
     @ApiOperation(value = "测试写")
@@ -43,6 +43,12 @@ public class DemoController {
     @GetMapping("/testUpdate")
     public String testUpdate() {
         return demoService.testUpdate();
+    }
+
+    @ApiOperation(value = "测试删除")
+    @GetMapping("/testDelete")
+    public String testDelete(int i) {
+        return demoService.testDelete(i);
     }
 
 }

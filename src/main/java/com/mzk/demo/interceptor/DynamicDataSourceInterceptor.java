@@ -1,5 +1,6 @@
 package com.mzk.demo.interceptor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.executor.keygen.SelectKeyGenerator;
 import org.apache.ibatis.mapping.BoundSql;
@@ -13,19 +14,24 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import java.util.Locale;
 import java.util.Properties;
 
-/*
+/**
+ * @author zar
+ *
  * 对于实现自己的Interceptor而言有两个很重要的注解，
  * 一个是@Intercepts，其值是一个@Signature数组。@Intercepts用于表明当前的对象是一个Interceptor，
  * 而@Signature则表明要拦截的接口、方法以及对应的参数类型。
+ * 添加签名，指定拦截那些类型。update会封装增加、删除、修改操作，所以不会再写insert和delete
+ * query会返回结果，需要RowBounds.class和ResultHandler.class处理
  */
-//添加签名，指定拦截那些类型。update会封装增加、删除、修改操作，所以不会再写insert和delete
-//query会返回结果，需要RowBounds.class和ResultHandler.class处理
+@Slf4j
 @Intercepts({@Signature(type = Executor.class, method = "update", args = {MappedStatement.class, Object.class}),
         @Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class,
                 RowBounds.class, ResultHandler.class})})
 public class DynamicDataSourceInterceptor implements Interceptor {
 
-    //正则表达insert或delete或update开头,\\u0020表示空格
+    /**
+     * 正则表达insert或delete或update开头,\\u0020表示空格
+     */
     private static final String REGEX = ".*insert\\u0020.*|.*delete\\u0020.*|.*update\\u0020.*";
 
     @Override
@@ -52,7 +58,7 @@ public class DynamicDataSourceInterceptor implements Interceptor {
                     BoundSql boundSql = ms.getSqlSource().getBoundSql(objects[1]);
                     //将所有制表符、回车、换行符都替换成空格。
                     String sql = boundSql.getSql().toLowerCase(Locale.CHINA).replaceAll("[\\t\\n\\r]", " ");
-                    System.out.println(sql);
+                    //System.out.println(sql);
                     if (sql.matches(REGEX)) {
                         //如果是insert、delete、update使用主库
                         lookupKey = DynamicDataSourceHolder.DB_MASTER;
@@ -65,14 +71,18 @@ public class DynamicDataSourceInterceptor implements Interceptor {
         } else {
             lookupKey = DynamicDataSourceHolder.DB_MASTER;
         }
-        System.out.println("设置方法[{" + ms.getId() + "}] use [{" + lookupKey + "}] Strategy, SqlCommanType [{" + ms.getSqlCommandType().name() + "}]");
+        log.info("设置方法[{" + ms.getId() + "}] use [{" + lookupKey + "}] Strategy, SqlCommanType [{" + ms.getSqlCommandType().name() + "}]");
         DynamicDataSourceHolder.setDbType(lookupKey);
         //向下传递
         return invocation.proceed();
     }
 
-    //当拦截的对象是Executor(org.apache.ibatis.executor.Executor),则拦截器将intercept()方法包装进去。如果不是，则直接返回本体。
-    //Executor是包含CRUD的操作
+    /**
+     * 当拦截的对象是Executor(org.apache.ibatis.executor.Executor),则拦截器将intercept()方法包装进去。如果不是，则直接返回本体。
+     * Executor是包含CRUD的操作
+     * @param target
+     * @return
+     */
     @Override
     public Object plugin(Object target) {
         if (target instanceof Executor) {
@@ -85,7 +95,6 @@ public class DynamicDataSourceInterceptor implements Interceptor {
     @Override
     public void setProperties(Properties arg0) {
         // TODO Auto-generated method stub
-
     }
 
 }

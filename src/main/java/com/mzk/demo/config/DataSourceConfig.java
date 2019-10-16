@@ -1,5 +1,6 @@
 package com.mzk.demo.config;
 
+import com.alibaba.druid.pool.DruidDataSource;
 import com.mzk.demo.interceptor.DynamicDataSource;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
@@ -7,7 +8,6 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -28,20 +28,25 @@ import java.util.Map;
 @MapperScan(basePackages = "com.mzk.demo.mapper", sqlSessionFactoryRef = "SqlSessionFactory")
 public class DataSourceConfig {
     @Primary
-    @Bean(name = "test1DataSource")
-    @ConfigurationProperties(prefix = "spring.datasource.test1")
+    @Bean(name = "masterDataSource")
+    @ConfigurationProperties(prefix = "spring.datasource.master")
     public DataSource getDateSource1() {
-        return DataSourceBuilder.create().build();
+        //使用Druid数据库连接池
+        return new DruidDataSource();
     }
 
-    @Bean(name = "test2DataSource")
-    @ConfigurationProperties(prefix = "spring.datasource.test2")
+    @Bean(name = "slaveDataSource")
+    @ConfigurationProperties(prefix = "spring.datasource.slave")
     public DataSource getDateSource2() {
-        return DataSourceBuilder.create().build();
+        return new DruidDataSource();
     }
 
+    /**
+     * mybatis配置文件路径
+     */
     @Value("${mybatis.config-location}")
     private String mybatisConfigLocation;
+
     /**
      * 设置事务，事务需要知道当前使用的是哪个数据源才能进行事务处理
      */
@@ -51,8 +56,8 @@ public class DataSourceConfig {
     }
 
     @Bean(name = "dynamicDataSource")
-    public DynamicDataSource DataSource(@Qualifier("test1DataSource") DataSource test1DataSource,
-                                        @Qualifier("test2DataSource") DataSource test2DataSource) {
+    public DynamicDataSource DataSource(@Qualifier("masterDataSource") DataSource test1DataSource,
+                                        @Qualifier("slaveDataSource") DataSource test2DataSource) {
         Map<Object, Object> targetDataSource = new HashMap<>();
         targetDataSource.put("master", test1DataSource);
         targetDataSource.put("slave", test2DataSource);
@@ -66,9 +71,11 @@ public class DataSourceConfig {
     public SqlSessionFactory test1SqlSessionFactory(@Qualifier("dynamicDataSource") DataSource dynamicDataSource)
             throws Exception {
         SqlSessionFactoryBean bean = new SqlSessionFactoryBean();
+        //设置数据源
         bean.setDataSource(dynamicDataSource);
-//        bean.setMapperLocations(
-//                new PathMatchingResourcePatternResolver().getResources("classpath*:mapper/*.xml"));
+        //设置mapper
+        //bean.setMapperLocations(new PathMatchingResourcePatternResolver().getResources("classpath*:mapper/*.xml"));
+        //设置mybatis配置文件
         bean.setConfigLocation(new PathMatchingResourcePatternResolver().getResource(mybatisConfigLocation));
         return bean.getObject();
     }

@@ -16,8 +16,6 @@ public class ReadAndWriteSeparationDemoApplicationTests {
     @Test
     public void contextLoads() {
 
-        System.out.println(1);
-        demoService.getAll();
     }
 
 }

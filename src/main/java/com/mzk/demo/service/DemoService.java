@@ -10,11 +10,33 @@ import java.util.Map;
  * @create: 2019-10-15 09:16
  */
 public interface DemoService {
-    List<Map> getAll();
+    /**
+     * 测试读
+     * @return
+     */
+    List<Map> testRead();
 
+    /**
+     * 测试写
+     * @return
+     */
     String testWrite();
 
+    /**
+     * 测试事务
+     * @return
+     */
     String testTransaction();
 
+    /**
+     * 测试更新
+     * @return
+     */
     String testUpdate();
+
+    /**
+     * 测试删除
+     * @return
+     */
+    String testDelete(int param);
 }

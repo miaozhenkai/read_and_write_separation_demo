@@ -3,7 +3,7 @@ package com.mzk.demo.interceptor;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 
 /**
- * @author Miaozhenkai
+ * @author zar
  */
 public class DynamicDataSource extends AbstractRoutingDataSource {
     @Override
